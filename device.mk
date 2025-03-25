@@ -222,6 +222,10 @@ PRODUCT_COPY_FILES += \
 # Biometrics
 PRODUCT_PACKAGES += \
     android.hardware.biometrics.fingerprint@2.1-service.yogurt
+    
+# Add FIDO feature which is needed for fingerprint
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.build.characteristics=default,fido
 
 # KPOC
 PRODUCT_PACKAGES += \
@@ -358,3 +362,5 @@ PRODUCT_COPY_FILES += \
     prebuilts/vndk/v30/arm64/arch-arm64-armv8-a/shared/vndk-sp/libutils.so:$(TARGET_COPY_OUT_VENDOR)/lib64/libutils-v30.so \
     prebuilts/vndk/v29/arm64/arch-arm64-armv8-a/shared/vndk-core/libxml2.so:$(TARGET_COPY_OUT_VENDOR)/lib64/libxml2-v29.so \
     prebuilts/vndk/v30/arm64/arch-arm64-armv8-a/shared/vndk-core/libmedia_helper.so:$(TARGET_COPY_OUT_VENDOR)/lib64/libmedia_helper-v30.so \
+
+

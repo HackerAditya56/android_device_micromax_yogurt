@@ -1,3 +1,4 @@
+
 # Audio
 ro.audio.silent=0
 ro.audio.usb.period_us=16000
@@ -16,8 +17,8 @@ ro.vendor.mtk_audio_alac_support=1
 ro.vendor.mtk_audio_ape_support=1
 ro.vendor.mtk_audio_tuning_tool_ver=V2.2
 ro.vendor.mtk_miravision_support=1
-
 # Bluetooth
+
 bluetooth.enable_timeout_ms=8000
 bluetooth.hardware.power.operating_voltage_mv=3300
 net.bt.name=Android
@@ -26,20 +27,20 @@ ro.odm.del_lan_switch_btn=1
 ro.odm.stream_bluetooth_sco=15
 ro.vendor.mtk.bt_sap_enable=true
 bluetooth.device.class_of_device=90,2,12
-bluetooth.profile.a2dp.source.enabled?=true
-bluetooth.profile.asha.central.enabled?=true
-bluetooth.profile.avrcp.target.enabled?=true
-bluetooth.profile.bas.client.enabled?=true
-bluetooth.profile.gatt.enabled?=true
-bluetooth.profile.hfp.ag.enabled?=true
-bluetooth.profile.hid.device.enabled?=true
-bluetooth.profile.hid.host.enabled?=true
-bluetooth.profile.map.server.enabled?=true
-bluetooth.profile.opp.enabled?=true
-bluetooth.profile.pan.nap.enabled?=true
-bluetooth.profile.pan.panu.enabled?=true
-bluetooth.profile.pbap.server.enabled?=true
-bluetooth.profile.sap.server.enabled?=true
+bluetooth.profile.a2dp.source.enabled=true
+bluetooth.profile.asha.central.enabled=true
+bluetooth.profile.avrcp.target.enabled=true
+bluetooth.profile.bas.client.enabled=true
+bluetooth.profile.gatt.enabled=true
+bluetooth.profile.hfp.ag.enabled=true
+bluetooth.profile.hid.device.enabled=true
+bluetooth.profile.hid.host.enabled=true
+bluetooth.profile.map.server.enabled=true
+bluetooth.profile.opp.enabled=true
+bluetooth.profile.pan.nap.enabled=true
+bluetooth.profile.pan.panu.enabled=true
+bluetooth.profile.pbap.server.enabled=true
+bluetooth.profile.sap.server.enabled=true
 
 # Camera
 persist.vendor.camera3.pipeline.bufnum.base.imgo=5
@@ -432,24 +433,21 @@ wifi.interface=wlan0
 
 # SurfaceFlinger
 ro.surface_flinger.running_without_sync_framework=true
-ro.surface_flinger.max_frame_buffer_acquired_buffers=3
 ro.surface_flinger.uclamp.min=130
 debug.sf.late.sf.duration=30000000
-debug.sf.late.app.duration=24000000
+debug.sf.late.app.duration=16500000
 debug.sf.early.sf.duration=30000000
-debug.sf.early.app.duration=24000000
+debug.sf.early.app.duration=16500000
 debug.sf.earlyGl.sf.duration=30000000
 debug.sf.earlyGl.app.duration=24000000
 debug.sf.hwc.min.duration=21000000
 debug.sf.phase_offset_threshold_for_next_vsync_ns=6100000
 debug.sf.use_phase_offsets_as_durations=1
-debug.sf.disable_client_composition_cache=1
-debug.sf.enable_gl_backpressure=1
 debug.sf.predict_hwc_composition_strategy=0
 debug.sf.enable_transaction_tracing=false
 debug.hwui.skia_atrace_enabled=false
 debug.sf.enable_egl_image_tracker=1
-debug.renderengine.backend=skiagl
+debug.renderengine.backend=gles
 debug.sf.treat_170m_as_sRGB=1
 
 # Zygote
@@ -459,3 +457,11 @@ zygote.critical_window.minute=10
 ro.zram.mark_idle_delay_mins=60
 ro.zram.first_wb_delay_mins=1440
 ro.zram.periodic_wb_delay_hours=2
+
+# some perforemence tweaks
+debug.hwui.use_hint_manager=true
+debug.hwui.target_cpu_time_percent=30
+persist.vendor.radio.enableadvanced=true
+ro.vendor.perf.scroll_opt=true
+debug.sf.enable_gl_backpressure=false
+

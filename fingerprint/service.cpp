@@ -23,26 +23,58 @@
 #include <android/hardware/biometrics/fingerprint/2.1/types.h>
 #include "BiometricsFingerprint.h"
 
+// Add these headers for property support
+#include <cutils/properties.h>
+
 using android::hardware::biometrics::fingerprint::V2_1::IBiometricsFingerprint;
 using android::hardware::biometrics::fingerprint::V2_1::implementation::BiometricsFingerprint;
 using android::hardware::configureRpcThreadpool;
 using android::hardware::joinRpcThreadpool;
 using android::sp;
 
+// Add this near the beginning of main() in service.cpp
+void checkVendorProps() {
+    char prop_value[PROPERTY_VALUE_MAX] = {0};
+    
+    // List of properties that might be relevant for fingerprint
+    const char* props[] = {
+        "ro.hardware.fingerprint",
+        "ro.boot.fpsensor",
+        "persist.sys.fp.vendor",
+        "ro.vendor.fingerprint.type",
+        "ro.vendor.fingerprint.module",
+        nullptr
+    };
+    
+    ALOGI("Checking fingerprint-related properties:");
+    for (int i = 0; props[i] != nullptr; i++) {
+        property_get(props[i], prop_value, "UNKNOWN");
+        ALOGI("  %s = %s", props[i], prop_value);
+    }
+}
 int main() {
+   
+    ALOGI("Fingerprint HAL service is starting up");
+    checkVendorProps();
     android::sp<IBiometricsFingerprint> bio = BiometricsFingerprint::getInstance();
+
+    if (bio == nullptr) {
+        ALOGE("Failed to get BiometricsFingerprint instance");
+        return 1;
+    }
+    ALOGI("Got BiometricsFingerprint instance, configuring RPC threadpool");
 
     configureRpcThreadpool(1, true /*callerWillJoin*/);
 
-    if (bio != nullptr) {
-        if (::android::OK != bio->registerAsService()) {
-            return 1;
-        }
-    } else {
-        ALOGE("Can't create instance of BiometricsFingerprint, nullptr");
+    if (bio->registerAsService() != android::OK) {
+        ALOGE("Failed to register fingerprint HAL service");
+        return 1;
     }
+    ALOGI("Fingerprint HAL service registered successfully");
 
     joinRpcThreadpool();
 
-    return 0; // should never get here
+    ALOGI("Fingerprint HAL service exiting"); // Should never get here
+    return 0;
 }
+

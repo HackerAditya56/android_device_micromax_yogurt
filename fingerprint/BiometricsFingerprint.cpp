@@ -25,12 +25,17 @@
 #include <inttypes.h>
 #include <unistd.h>
 
+#include <cutils/properties.h>
+#ifndef PROPERTY_VALUE_MAX
+#define PROPERTY_VALUE_MAX 92
+#endif
 namespace android {
 namespace hardware {
 namespace biometrics {
 namespace fingerprint {
 namespace V2_1 {
 namespace implementation {
+using namespace android::hardware::biometrics::fingerprint::V2_1::implementation;
 
 // Supported fingerprint HAL version
 static const uint16_t kVersion = HARDWARE_MODULE_API_VERSION(2, 1);
@@ -39,6 +44,23 @@ using RequestStatus =
         android::hardware::biometrics::fingerprint::V2_1::RequestStatus;
 
 BiometricsFingerprint *BiometricsFingerprint::sInstance = nullptr;
+
+// by me
+Return<RequestStatus> BiometricsFingerprint::isUdfpsSensor() {
+    ALOGI("Call to isUdfpsSensor");
+    return RequestStatus::SYS_OK;  // Return true
+}
+
+Return<uint64_t> BiometricsFingerprint::getDeviceId() {
+    ALOGI("getDeviceId called");
+    if (mDevice == nullptr) {
+        ALOGI("getDeviceId: Device not initialized, returning fixed ID");
+        // Post-QPR1 needs a non-zero ID even when mDevice is null
+        return 9362; // Fixed ID based on sensor model
+    }
+    return mDevice->get_authenticator_id(mDevice);  // Use the actual device ID from the HAL instead of hardcoded 1234
+}
+// end by me
 
 BiometricsFingerprint::BiometricsFingerprint() : mClientCallback(nullptr), mDevice(nullptr) {
     sInstance = this; // keep track of the most recent instance
@@ -170,7 +192,12 @@ Return<RequestStatus> BiometricsFingerprint::postEnroll() {
 }
 
 Return<uint64_t> BiometricsFingerprint::getAuthenticatorId() {
-    return mDevice->get_authenticator_id(mDevice);
+    ALOGI("getAuthenticatorId called");
+    uint64_t id = mDevice ? mDevice->get_authenticator_id(mDevice) : 0;
+    ALOGI("Current AuthenticatorId: %" PRIu64, id);
+    
+    // Always return a valid ID even if the hardware returns 0
+    return (id != 0) ? id : 0x1234567887654321ULL;
 }
 
 Return<RequestStatus> BiometricsFingerprint::cancel() {
@@ -178,10 +205,12 @@ Return<RequestStatus> BiometricsFingerprint::cancel() {
 }
 
 Return<RequestStatus> BiometricsFingerprint::enumerate()  {
+    ALOGI("enumerate called");
     return ErrorFilter(mDevice->enumerate(mDevice));
 }
 
 Return<RequestStatus> BiometricsFingerprint::remove(uint32_t gid, uint32_t fid) {
+    ALOGI("remove called with gid: %u, fid: %u", gid, fid);
     return ErrorFilter(mDevice->remove(mDevice, gid, fid));
 }
 
@@ -201,6 +230,8 @@ Return<RequestStatus> BiometricsFingerprint::setActiveGroup(uint32_t gid,
 
 Return<RequestStatus> BiometricsFingerprint::authenticate(uint64_t operationId,
         uint32_t gid) {
+    ALOGI("authenticate called with operation ID: %" PRIu64 ", gid: %u", operationId, gid);
+    // Call the original implementation
     return ErrorFilter(mDevice->authenticate(mDevice, operationId, gid));
 }
 
@@ -214,55 +245,65 @@ IBiometricsFingerprint* BiometricsFingerprint::getInstance() {
 fingerprint_device_t* BiometricsFingerprint::openHal() {
     int err;
     const hw_module_t *hw_mdl = nullptr;
-    ALOGD("Opening fingerprint hal library...");
-    if (0 != (err = hw_get_module(FINGERPRINT_HARDWARE_MODULE_ID, &hw_mdl))) {
-        ALOGE("Can't open fingerprint HW Module, error: %d", err);
+    
+    ALOGI("Attempting to open fingerprint HAL...");
+    err = hw_get_module(FINGERPRINT_HARDWARE_MODULE_ID, &hw_mdl);
+    if (0 != err) {
+        ALOGE("Failed to get fingerprint HW module, err: %d", err);
         return nullptr;
     }
-
     if (hw_mdl == nullptr) {
-        ALOGE("No valid fingerprint module");
+        ALOGE("No valid fingerprint module found");
         return nullptr;
     }
+    ALOGI("Found fingerprint module: %s", hw_mdl->name);
 
-    fingerprint_module_t const *module =
-        reinterpret_cast<const fingerprint_module_t*>(hw_mdl);
+    fingerprint_module_t const *module = reinterpret_cast<const fingerprint_module_t*>(hw_mdl);
     if (module->common.methods->open == nullptr) {
-        ALOGE("No valid open method");
+        ALOGE("Fingerprint module open method is null");
         return nullptr;
     }
-
+    
     hw_device_t *device = nullptr;
-
-    if (0 != (err = module->common.methods->open(hw_mdl, nullptr, &device))) {
-        ALOGE("Can't open fingerprint methods, error: %d", err);
+    ALOGI("Calling fingerprint module open method...");
+    err = module->common.methods->open(hw_mdl, nullptr, &device);
+    if (0 != err || device == nullptr) {
+        ALOGE("Failed to open fingerprint device, err: %d", err);
         return nullptr;
     }
-
+    
+    // Add version check and logging
+    ALOGI("Fingerprint device version: %d", device->version);
     if (kVersion != device->version) {
-        // enforce version on new devices because of HIDL@2.1 translation layer
-        ALOGE("Wrong fp version. Expected %d, got %d", kVersion, device->version);
+        ALOGE("Fingerprint device version mismatch; expected %d, got %d", kVersion, device->version);
         return nullptr;
     }
-
-    fingerprint_device_t* fp_device =
-        reinterpret_cast<fingerprint_device_t*>(device);
-
-    if (0 != (err =
-            fp_device->set_notify(fp_device, BiometricsFingerprint::notify))) {
-        ALOGE("Can't register fingerprint module callback, error: %d", err);
+    
+    fingerprint_device_t *fp_device = reinterpret_cast<fingerprint_device_t *>(device);
+    ALOGI("Fingerprint device opened successfully");
+    
+    // Register callback
+    err = fp_device->set_notify(fp_device, BiometricsFingerprint::notify);
+    if (0 != err) {
+        ALOGE("Failed to register fingerprint callback, err: %d", err);
         return nullptr;
     }
-
+    ALOGI("Fingerprint callback registered successfully");
+    
     return fp_device;
 }
-
 void BiometricsFingerprint::notify(const fingerprint_msg_t *msg) {
     BiometricsFingerprint* thisPtr = static_cast<BiometricsFingerprint*>(
             BiometricsFingerprint::getInstance());
     std::lock_guard<std::mutex> lock(thisPtr->mClientCallbackMutex);
     if (thisPtr == nullptr || thisPtr->mClientCallback == nullptr) {
         ALOGE("Receiving callbacks before the client callback is registered.");
+        return;
+    }
+    
+      // Additional logging for debugging
+    if (msg == nullptr) {
+        ALOGE("Received null message");
         return;
     }
     const uint64_t devId = reinterpret_cast<uint64_t>(thisPtr->mDevice);

@@ -60,6 +60,10 @@ public:
     Return<RequestStatus> remove(uint32_t gid, uint32_t fid) override;
     Return<RequestStatus> setActiveGroup(uint32_t gid, const hidl_string& storePath) override;
     Return<RequestStatus> authenticate(uint64_t operationId, uint32_t gid) override;
+    
+    // by me 
+    Return<RequestStatus> isUdfpsSensor();
+    Return<uint64_t> getDeviceId();
 
 private:
     static fingerprint_device_t* openHal();
