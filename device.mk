@@ -364,3 +364,18 @@ PRODUCT_COPY_FILES += \
     prebuilts/vndk/v30/arm64/arch-arm64-armv8-a/shared/vndk-core/libmedia_helper.so:$(TARGET_COPY_OUT_VENDOR)/lib64/libmedia_helper-v30.so \
 
 
+# Preoptimize apps for faster boot and less RAM
+WITH_DEXPREOPT_SPEED_APPS := true
+DONT_DEXPREOPT_PREBUILTS := false
+
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.boot.verifiedbootstate=green \
+    ro.boot.flash.locked=1 \
+    ro.boot.veritymode=enforcing \
+    ro.boot.warranty_bit=0 \
+    ro.warranty_bit=0 \
+    ro.debuggable=0 \
+    ro.secure=1 \
+    ro.build.type=user \
+    ro.build.tags=release-keys
+

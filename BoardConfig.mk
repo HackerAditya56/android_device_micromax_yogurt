@@ -156,3 +156,8 @@ DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/configs/vintf/manifest.xml
 TARGET_RELEASETOOLS_EXTENSIONS := $(DEVICE_PATH)
 
 DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := $(DEVICE_PATH)/configs/vintf/framework_compatibility_matrix.xml
+MALLOC_SVELTE := true
+MALLOC_LOW_MEMORY := true
+
+# Play Integrity specific configurations
+BOARD_AVB_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
