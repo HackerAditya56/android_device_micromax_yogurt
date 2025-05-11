@@ -54,6 +54,10 @@ persist.radio.rat_on=combine
 persist.radio.data_ltd_sys_ind=1
 persist.radio.data_con_rprt=1
 persist.radio.calls.on.ims=1
+ro.vendor.ims_support=1
+ro.vendor.mtk_volte_support=1
+persist.vendor.ims.enable=1
+
 
 # OMX
 debug.stagefright.omx_default_rank.sw-audio=1

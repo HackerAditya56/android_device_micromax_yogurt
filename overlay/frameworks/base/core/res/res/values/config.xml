@@ -766,27 +766,5 @@
          correctly use them when installed on your device.  Otherwise, keep this disabled
          so that applications can still use their own mechanisms. -->
    <bool name="config_enableAutoPowerModes">true</bool>
-   
-   <bool name="config_enableFingerprint">true</bool>
-   
-   <bool name="config_supportFingerprint">true</bool>
-   <bool name="config_is_front_fingerprint_sensor">false</bool>
-   <integer name="config_fingerprintSensorLocation">1</integer>
-   
-   <bool name="config_fingerprintSupportsUdfps">false</bool>
-   <bool name="config_fingerprintSupportsGestures">false</bool>
-   <bool name="config_is_powerbutton_fps" translatable="false">false</bool>
-   
-    <!-- Whether to show or hide the fingerprint enrollment -->
-   <bool name="config_show_fingerprint_enrollment">true</bool>
-    
-    <!-- Fingerprint sensor location -->
-   <item name="fingerprint_sensor_location_fraction_y" type="fraction">35%</item>
-    
-    <!-- Force enable the fingerprint settings option -->
-   <bool name="config_supportFingerprintGesture">true</bool>
-   <bool name="config_show_fingerprint_settings">true</bool>
-   
-   <bool name="config_show_security_settings_when_hardware_not_detected">true</bool>
 
 </resources>

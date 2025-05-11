@@ -112,6 +112,17 @@ PRODUCT_BOOT_JARS += \
     mediatek-telephony-base \
     mediatek-telephony-common
 
+# IMS
+PRODUCT_PACKAGES += \
+    ImsService \
+    android.hardware.ims@1.0-service \
+    android.hardware.ims@1.5-service \
+    android.hardware.ims@1.6-service \
+    ims-ext-common \
+    ims-ext-common_system \
+    telephony-ext
+
+
 # TinyXML
 PRODUCT_PACKAGES += \
     libtinyxml
