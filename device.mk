@@ -234,10 +234,13 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     android.hardware.biometrics.fingerprint@2.1-service.yogurt
     
-# Add FIDO feature which is needed for fingerprint
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.build.characteristics=default,fido
-
+DEVICE_MANIFEST_FRAGMENT += \
+     $(LOCAL_PATH)/fingerprint/android.hardware.biometrics.fingerprint@2.1-service.yogurt.xml
+     
+# Add Fingerprint HAL RC file
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/fingerprint/android.hardware.biometrics.fingerprint@2.1-service.yogurt.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/android.hardware.biometrics.fingerprint@2.1-service.yogurt.rc
+    
 # KPOC
 PRODUCT_PACKAGES += \
     libsuspend
