@@ -1,30 +1,31 @@
-cc_library_shared {
+cc_binary {
     name: "android.hardware.biometrics.fingerprint@2.1-service.yogurt",
-    init_rc: ["android.hardware.biometrics.fingerprint@2.1-service.yogurt.rc"],
-    relative_install_path: "hw",
-    vendor: true,
-    visibility: [
-        "//system/libhidl",     // Allows access to libhidltransport and similar libraries
-        "//device/micromax/yogurt", // Allows modules within your device tree to depend on this HAL
-    ],
-    srcs: [
+    init_rc: ["android.hardware.biometrics.fingerprint@2.1-service.yogurt.rc"],  // Init script for starting the service
+    vintf_fragments: ["android.hardware.biometrics.fingerprint@2.1-service.yogurt.xml"], // VINTF manifest fragment for HAL declaration
+    relative_install_path: "hw",  // Install the binary in /vendor/bin/hw/
+    vendor: true,  // Indicates this is a vendor-specific HAL
+    
+    srcs: [  // Source files included in the build
         "BiometricsFingerprint.cpp",
         "service.cpp",
     ],
-    shared_libs: [
+
+    shared_libs: [  // Shared libraries the binary depends on
         "libhardware",
         "libutils",
         "libhidlbase",
         "libhidltransport",
         "liblog",
-        "android.hardware.biometrics.fingerprint@2.1",
+        "android.hardware.biometrics.fingerprint@2.1",  // HIDL interface library
     ],
-    target: {
-        android: {
-            enabled: true,
-        },
-    },
+
     cflags: [
         "-DLOG_NDEBUG=0", // Enable detailed logs for debugging
     ],
+
+    target: {
+        android: {
+            enabled: true,  // Only build for Android targets
+        },
+    },
 }
